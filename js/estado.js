@@ -35,7 +35,15 @@ function validar(obj) {
   if (!Array.isArray(obj.huevos)) return 'faltan los huevos';
   if (typeof obj.nivel !== 'number' || obj.nivel < 1 || obj.nivel > 8) return 'nivel inválido';
   if (!obj.estadisticas || typeof obj.estadisticas !== 'object') return 'faltan las estadísticas';
+  if (obj.frasesRecientes !== undefined && !Array.isArray(obj.frasesRecientes)) return 'frases recientes inválidas';
+  if (obj.vocabulario !== undefined && !Array.isArray(obj.vocabulario)) return 'vocabulario inválido';
   return null;
+}
+
+// Mezcla un estado leído con el inicial para que no falte ningún campo.
+function completar(obj) {
+  const base = copiaInicial();
+  return { ...base, ...obj, estadisticas: { ...base.estadisticas, ...(obj.estadisticas || {}) } };
 }
 
 export function crearEstado(almacen, reloj = () => new Date()) {
@@ -52,7 +60,7 @@ export function crearEstado(almacen, reloj = () => new Date()) {
       const crudo = almacen.getItem(CLAVE);
       if (crudo) {
         const obj = JSON.parse(crudo);
-        if (!validar(obj)) datos = { ...copiaInicial(), ...obj, estadisticas: { ...copiaInicial().estadisticas, ...obj.estadisticas } };
+        if (!validar(obj)) datos = completar(obj);
       }
     } catch {
       datos = copiaInicial();
@@ -63,6 +71,7 @@ export function crearEstado(almacen, reloj = () => new Date()) {
     return {
       fecha: hoy(), numero: datos.huevos.length + 1, aciertos: 0, meta: META_INICIAL,
       fallosPorFrase: {}, eclosionado: false, aciertosPrimera: 0, respondidas: 0, seguidosPrimera: 0,
+      nivelAlcanzado: datos.nivel, // trinquete de la calibración
     };
   }
 
@@ -90,8 +99,10 @@ export function crearEstado(almacen, reloj = () => new Date()) {
     if (acierto) {
       h.aciertos++;
       h.respondidas++;
-      if (primeraVez) { h.aciertosPrimera++; h.seguidosPrimera++; }
+      // Con pista no es "a la primera": la escalera no sube con ayuda.
+      if (primeraVez && !usoPista) { h.aciertosPrimera++; h.seguidosPrimera++; }
       if (usoPista) est.trampasCazadas++;
+      h.nivelAlcanzado = nivelActual();
       const clave = ejercicio.claveRepeticion || ejercicio.frase;
       if (!datos.frasesRecientes.some(f => f.frase === clave)) {
         datos.frasesRecientes.push({ frase: clave, fecha: hoy() });
@@ -112,7 +123,9 @@ export function crearEstado(almacen, reloj = () => new Date()) {
   // Nivel con el que generar el siguiente ejercicio (en calibración sube en vivo).
   function nivelActual() {
     const h = datos.huevoActual;
-    if (!datos.calibrado && h && !h.eclosionado) return nivelEnCalibracion(datos.nivel, h.seguidosPrimera);
+    if (!datos.calibrado && h && !h.eclosionado) {
+      return nivelEnCalibracion(datos.nivel, h.seguidosPrimera, h.nivelAlcanzado || datos.nivel);
+    }
     return datos.nivel;
   }
 
@@ -126,7 +139,7 @@ export function crearEstado(almacen, reloj = () => new Date()) {
     datos.huevos.push({ numero: h.numero, nombre, rareza, fecha: h.fecha, fechaEclosion: h.fechaEclosion });
     datos.nivel = datos.calibrado
       ? nivelTrasRonda(datos.nivel, h.aciertosPrimera, h.respondidas)
-      : nivelEnCalibracion(datos.nivel, h.seguidosPrimera);
+      : nivelEnCalibracion(datos.nivel, h.seguidosPrimera, h.nivelAlcanzado || datos.nivel);
     datos.calibrado = true;
     guardar();
   }
@@ -140,7 +153,7 @@ export function crearEstado(almacen, reloj = () => new Date()) {
     try { obj = JSON.parse(texto); } catch { return { ok: false, error: 'el archivo no es JSON' }; }
     const error = validar(obj);
     if (error) return { ok: false, error };
-    datos = { ...copiaInicial(), ...obj };
+    datos = completar(obj);
     guardar();
     return { ok: true };
   }

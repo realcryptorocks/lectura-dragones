@@ -168,7 +168,7 @@ function responder(ids) {
   const { ejercicio } = actual;
   const segundos = (Date.now() - actual.mostradoEn) / 1000;
   const minimo = ejercicio.frase.split(/\s+/).length * SEGUNDOS_POR_PALABRA;
-  if (segundos < minimo && !ids.includes('nohay')) {
+  if (segundos < minimo) {
     avisar('Léelo otra vez');
     // Sin penalización: se vuelve a pintar el mismo ejercicio.
     if (['cuanto', 'orden'].includes(ejercicio.tipo)) pintarActual();
@@ -194,9 +194,15 @@ function mostrarTrampa(ejercicio) {
 }
 
 function darPista() {
+  const { ejercicio } = actual;
   actual.usoPista = true;
-  actual.vista.iluminar(actual.ejercicio.palabraClave);
-  if (conVoz) decir(actual.ejercicio.palabraClave);
+  if (ejercicio.tipo === 'mentiroso') {
+    // Iluminar la mentira sería regalar la respuesta: se repite la verdad.
+    if (conVoz) decir(ejercicio.voz);
+    return;
+  }
+  actual.vista.iluminar(ejercicio.palabraClave);
+  if (conVoz) decir(ejercicio.palabraClave);
 }
 
 let avisoTemporizador = null;
@@ -284,6 +290,18 @@ function pintarCamino() {
 
 // ---------- arranque ----------
 document.getElementById('huevo-inicio').addEventListener('click', empezarRonda);
+
+// Al volver del panel (atrás de Android, bfcache) o al reanudar la app al día
+// siguiente, se relee el almacén para no pisar lo que cambió el padre y para
+// que aparezca el huevo nuevo sin recargar.
+function refrescarSiEstaParado() {
+  const enReposo = !pantallas.inicio.hidden || !pantallas.dormido.hidden;
+  if (!enReposo) return;
+  estado.cargar();
+  pintarInicio();
+}
+window.addEventListener('pageshow', ev => { if (ev.persisted) refrescarSiEstaParado(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refrescarSiEstaParado(); });
 
 (async () => {
   conVoz = params.get('sinvoz') ? false : await vozDisponible();

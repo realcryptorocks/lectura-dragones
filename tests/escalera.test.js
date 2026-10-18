@@ -15,6 +15,14 @@ test('acotado entre 1 y 8', () => {
 
 test('sin ejercicios no cambia', () => assert.equal(nivelTrasRonda(4, 0, 0), 4));
 
+test('calibración: un fallo no devuelve al nivel 1 (trinquete)', () => {
+  // nivel base 1, ya había subido a 4 y ahora la racha es 0
+  assert.equal(nivelEnCalibracion(1, 0, 4), 4);
+  assert.equal(nivelEnCalibracion(1, 2, 4), 4);
+  assert.equal(nivelEnCalibracion(1, 6, 4), 4);
+  assert.equal(nivelEnCalibracion(4, 2, 4), 5);
+});
+
 test('calibración sube cada 2 aciertos seguidos', () => {
   assert.equal(nivelEnCalibracion(1, 1), 1);
   assert.equal(nivelEnCalibracion(1, 2), 2);

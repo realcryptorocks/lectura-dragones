@@ -110,14 +110,32 @@ def _dragon_relieve():
     return malla
 
 
-def _texto(nombre):
+def poligonos_texto(nombre):
+    """Contornos del texto como polígonos con sus huecos (regla par-impar):
+    un contorno dentro de otro es un hueco (la o, la a, la B)."""
     fuente = FontProperties(family="DejaVu Sans", weight="bold")
     ruta = TextPath((0, 0), nombre, size=10, prop=fuente)
-    poligonos = [Polygon(p) for p in ruta.to_polygons() if len(p) >= 3]
-    forma = unary_union([p.buffer(0) for p in poligonos])
-    minx, miny, maxx, maxy = forma.bounds
+    contornos = [Polygon(p).buffer(0) for p in ruta.to_polygons() if len(p) >= 3]
+    contornos = [c for c in contornos if not c.is_empty and c.area > 0]
+    contornos.sort(key=lambda c: c.area, reverse=True)
+    profundidad, padre = [], []
+    for i, c in enumerate(contornos):
+        contenedores = [j for j in range(i) if contornos[j].contains(c.representative_point())]
+        profundidad.append(len(contenedores))
+        padre.append(min(contenedores, key=lambda j: contornos[j].area) if contenedores else None)
+    piezas = []
+    for i, c in enumerate(contornos):
+        if profundidad[i] % 2:
+            continue
+        huecos = [contornos[k].exterior.coords for k in range(len(contornos)) if padre[k] == i and profundidad[k] % 2]
+        piezas.append(Polygon(c.exterior.coords, huecos))
+    return piezas
+
+
+def _texto(nombre):
+    piezas = poligonos_texto(nombre)
+    minx, miny, maxx, maxy = unary_union(piezas).bounds
     escala = min(TEXTO_ALTO_MAX / (maxy - miny), TEXTO_ANCHO_MAX / (maxx - minx))
-    piezas = forma.geoms if hasattr(forma, "geoms") else [forma]
     mallas = []
     for p in piezas:
         exterior = [((x - minx) * escala, (y - miny) * escala) for x, y in p.exterior.coords]

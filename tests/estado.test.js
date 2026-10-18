@@ -91,6 +91,42 @@ test('eclosionar recalcula el nivel: calibración el primer día, escalera despu
   assert.equal(e.datos.nivel, 5); // 8 aciertos seguidos desde 1 → +4
 });
 
+test('calibración: 7 aciertos, un fallo y uno más acaba en nivel 4, no en 1', () => {
+  const e = crearEstado(almacenMemoria(), () => fecha('2026-10-18'));
+  e.cargar();
+  e.huevoDeHoy();
+  for (let i = 0; i < 7; i++) e.registrarRespuesta(ejercicio({ frase: 'f' + i }), { acierto: true, primeraVez: true, usoPista: false });
+  assert.equal(e.nivelActual(), 4);
+  e.registrarRespuesta(ejercicio({ frase: 'g' }), { acierto: false, primeraVez: true, usoPista: false });
+  assert.equal(e.nivelActual(), 4);
+  e.registrarRespuesta(ejercicio({ frase: 'g' }), { acierto: true, primeraVez: false, usoPista: false });
+  e.eclosionar('Nepo', 'comun');
+  assert.equal(e.datos.nivel, 4);
+});
+
+test('un acierto con pista no cuenta como acierto a la primera', () => {
+  const e = crearEstado(almacenMemoria(), () => fecha('2026-10-18'));
+  e.cargar();
+  e.huevoDeHoy();
+  e.registrarRespuesta(ejercicio({ frase: 'a' }), { acierto: true, primeraVez: true, usoPista: true });
+  e.registrarRespuesta(ejercicio({ frase: 'b' }), { acierto: true, primeraVez: true, usoPista: true });
+  const h = e.huevoDeHoy();
+  assert.equal(h.aciertos, 2);
+  assert.equal(h.aciertosPrimera, 0);
+  assert.equal(e.nivelActual(), 1);
+});
+
+test('importar rechaza listas que no lo son y rellena estadísticas incompletas', () => {
+  const e = crearEstado(almacenMemoria(), () => fecha('2026-10-18'));
+  e.cargar();
+  assert.equal(e.importar(JSON.stringify({ ...ESTADO_INICIAL, frasesRecientes: 'x' })).ok, false);
+  assert.equal(e.importar(JSON.stringify({ ...ESTADO_INICIAL, vocabulario: 5 })).ok, false);
+  assert.equal(e.importar(JSON.stringify({ ...ESTADO_INICIAL, estadisticas: {} })).ok, true);
+  assert.deepEqual(e.datos.estadisticas.palabras, {});
+  assert.equal(e.datos.estadisticas.trampasCazadas, 0);
+  assert.doesNotThrow(() => e.frasesRecientes());
+});
+
 test('eclosionar con 50% de aciertos a la primera mantiene el nivel tras calibrar', () => {
   const e = crearEstado(almacenMemoria(JSON.stringify({ ...ESTADO_INICIAL, nivel: 4, calibrado: true })), () => fecha('2026-10-18'));
   e.cargar();

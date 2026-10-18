@@ -11,7 +11,8 @@ export function nivelTrasRonda(nivel, aciertosPrimera, total) {
   return acotar(nivel);
 }
 
-// Primer día: sube un peldaño cada 2 aciertos seguidos a la primera.
-export function nivelEnCalibracion(nivel, aciertosPrimeraSeguidos) {
-  return acotar(nivel + Math.floor(aciertosPrimeraSeguidos / 2));
+// Primer día: sube un peldaño cada 2 aciertos seguidos a la primera. Es un
+// trinquete: un fallo corta la racha pero no devuelve los peldaños ganados.
+export function nivelEnCalibracion(nivel, aciertosPrimeraSeguidos, nivelAlcanzado = nivel) {
+  return Math.max(acotar(nivelAlcanzado), acotar(nivel + Math.floor(aciertosPrimeraSeguidos / 2)));
 }

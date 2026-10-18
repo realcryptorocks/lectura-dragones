@@ -1,6 +1,6 @@
 // Service worker: guarda todos los archivos del juego para que funcione sin
 // conexión. Al cambiar VERSION se renueva la caché en la siguiente visita.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `cria-dragones-${VERSION}`;
 const ARCHIVOS = [
   './', './index.html', './panel.html', './manifest.webmanifest',

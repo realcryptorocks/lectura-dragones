@@ -25,6 +25,12 @@ def test_nombre_largo_cabe():
     assert m.is_watertight
 
 
+def test_las_letras_conservan_sus_huecos():
+    from legendario_stl import poligonos_texto
+    piezas = poligonos_texto("Brulok")
+    assert sum(len(p.interiors) for p in piezas) >= 3  # B (2), o (1)
+
+
 def test_el_nombre_cambia_la_pieza():
     a = construir_pieza("Nepo")
     b = construir_pieza("Lima")
