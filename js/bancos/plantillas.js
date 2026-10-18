@@ -41,7 +41,7 @@ const DETALLE = [
   'Pide ayuda al {criatura} {rasgos}',
   'Abraza al {criatura} {rasgos}',
   'El {criatura} {rasgos} se ha perdido. Tócalo',
-  'Enseña el {criatura} {rasgos}',
+  'Señala con el dedo el {criatura} {rasgos}',
   'Toca el {criatura} {rasgos} y nada más',
   'Dale un premio al {criatura} {rasgos}',
   'Haz una foto al {criatura} {rasgos}',
@@ -84,7 +84,7 @@ const NEGACION = [
   'Haz una foto al {criatura} que NO {rasgoNeg}',
   'Toca solo el {criatura} que NO {rasgoNeg}',
   'El {criatura} que NO {rasgoNeg} está feliz. Tócalo',
-  'Enseña el {criatura} que NO {rasgoNeg}',
+  'Señala con el dedo el {criatura} que NO {rasgoNeg}',
   'Toca el {criatura} que NO {rasgoNeg} ahora',
   'Dale un premio al {criatura} que NO {rasgoNeg}',
 ];
@@ -134,7 +134,7 @@ const CUANTO = [
   'Toca {numero} {criaturas} y gana una estrella',
   'Pon el dedo en {numero} {criaturas}',
   'Solo {numero} {criaturas} tienen sueño. Tócalos',
-  'Enseña {numero} {criaturas}',
+  'Señala con el dedo {numero} {criaturas}',
   'Toca {numero} {criaturas} y ya está',
 ];
 

@@ -9,6 +9,7 @@ import { svgCriatura } from './sprites.js';
 import { svgDragon } from './dragones.js';
 import { pintarEjercicio, resaltar } from './ejercicios/render.js';
 import { vozDisponible, decir } from './voz.js';
+import { sonidos } from './sonidos.js';
 
 // ---------- parámetros de prueba: ?fecha=AAAA-MM-DD&semilla=N&sinvoz=1 ----------
 const params = new URLSearchParams(location.search);
@@ -139,6 +140,7 @@ function pintarActual() {
   actual.vista = pintarEjercicio(document.getElementById('zona-ejercicio'), ejercicio, {
     alResponder: responder,
     alPedirPista: darPista,
+    alTocar: () => sonidos.toque(),
     alRepetirVoz: () => ejercicio.voz && decir(ejercicio.voz),
   }, { conVoz });
   actual.mostradoEn = Date.now();
@@ -160,6 +162,7 @@ function responder(ids) {
   const segundos = (Date.now() - actual.mostradoEn) / 1000;
   const minimo = ejercicio.frase.split(/\s+/).length * SEGUNDOS_POR_PALABRA;
   if (segundos < minimo) {
+    sonidos.otraVez();
     avisar('Léelo otra vez');
     // Sin penalización: se vuelve a pintar el mismo ejercicio.
     if (['cuanto', 'orden'].includes(ejercicio.tipo)) pintarActual();
@@ -170,10 +173,14 @@ function responder(ids) {
   const primeraVez = actual.fallos === 0;
   if (esCorrecta(ejercicio, ids)) {
     estado.registrarRespuesta(ejercicio, { acierto: true, primeraVez, usoPista: actual.usoPista });
+    sonidos.acierto();
+    const h = estado.huevoDeHoy();
+    if (h && h.aciertos < h.meta) setTimeout(() => sonidos.grieta(), 220); // el huevo se agrieta un poco más
     siguienteEjercicio();
   } else {
     estado.registrarRespuesta(ejercicio, { acierto: false, primeraVez, usoPista: false });
     actual.fallos++;
+    sonidos.trampa();
     mostrarTrampa(ejercicio);
   }
 }
@@ -187,6 +194,7 @@ function mostrarTrampa(ejercicio) {
 function darPista() {
   const { ejercicio } = actual;
   actual.usoPista = true;
+  sonidos.pista();
   if (ejercicio.tipo === 'mentiroso') {
     // Iluminar la mentira sería regalar la respuesta: se repite la verdad.
     if (conVoz) decir(ejercicio.voz);
@@ -221,6 +229,9 @@ function eclosionar(huevo) {
   huevoEl.innerHTML = svgHuevoDelDia(huevo.numero, 8);
   huevoEl.hidden = false;
   huevoEl.classList.add('temblando');
+  sonidos.grieta();
+  setTimeout(() => sonidos.grieta(), 700);
+  setTimeout(() => sonidos.eclosion(rareza === 'legendario'), 2000);
   dragonEl.hidden = true;
   seguir.hidden = true;
   extra.hidden = true;
@@ -298,6 +309,6 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 (async () => {
   conVoz = params.get('sinvoz') ? false : await vozDisponible();
   // ?debug=1 expone el estado para pruebas desde la consola.
-  if (params.get('debug')) window.cria = { estado, actual: () => actual, get conVoz() { return conVoz; } };
+  if (params.get('debug')) window.cria = { estado, sonidos, actual: () => actual, get conVoz() { return conVoz; } };
   pintarInicio();
 })();

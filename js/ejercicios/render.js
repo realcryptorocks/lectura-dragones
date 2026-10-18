@@ -6,6 +6,8 @@ import { LUGARES } from '../bancos/palabras.js';
 export function pintarEjercicio(contenedor, ejercicio, callbacks, opciones = {}) {
   contenedor.innerHTML = '';
   const { conVoz } = opciones;
+  // Un "pop" al tocar cualquier botón del ejercicio (la respuesta suena aparte).
+  if (callbacks.alTocar) contenedor.addEventListener('click', ev => { if (ev.target.closest('button')) callbacks.alTocar(); });
 
   // --- cabecera: frase + altavoz ---
   const cabecera = el('div', 'cabecera-frase');
