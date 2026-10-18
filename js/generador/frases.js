@@ -10,7 +10,8 @@ export { EXENTAS };
 // ---------- utilidades ----------
 
 function rellenar(texto, valores) {
-  return texto.replace(/\{([a-zA-Z]+)\}/g, (_, k) => valores[k]);
+  return texto.replace(/\{([a-zA-Z]+)\}/g, (_, k) => valores[k])
+    .replace(/\ba el\b/g, 'al').replace(/\bde el\b/g, 'del');
 }
 
 function capitalizar(s) {
@@ -26,8 +27,9 @@ export function cumpleRasgos(sprite, rasgos) {
   return Object.entries(rasgos).every(([k, v]) => sprite[k] === v);
 }
 
+// Rasgos cuyo texto se puede leer en este nivel ("con"/"sin" están exentas).
 function rasgosPermitidos(spec, nivel) {
-  return RASGOS_CLAVE.filter(r => textoRasgo(spec, r).split(' ').every(p => permitida(p, nivel)));
+  return RASGOS_CLAVE.filter(r => textoRasgo(spec, r).split(' ').every(p => EXENTAS.has(p) || permitida(p, nivel)));
 }
 
 // "azul con manchas", "grande sin alas", "rojo pequeño"…: color y tamaño
@@ -58,32 +60,36 @@ function opcionesSprite(specs, rng, conNoHay = true) {
 
 // ---------- tipos ----------
 
-function detalle(nivel, rng, plantilla) {
+// Los cuatro sprites de "detalle" y "no hay" tienen la misma geometría (un
+// cuadrado: cada uno difiere en 1 rasgo de dos vecinos y en 2 del tercero),
+// para que no se pueda adivinar "el que se parece a los demás".
+function escenaDosRasgos(nivel, rng) {
   const spec = specAleatorio(nivel, rng);
-  const posibles = rasgosPermitidos(spec, nivel);
-  const [clave, otro] = barajar(posibles, rng);
+  const [clave, otro, tercero] = barajar(rasgosPermitidos(spec, nivel), rng);
   const rasgos = { [clave]: valorDe(spec, clave), [otro]: valorDe(spec, otro) };
-  const v1 = cambiarRasgo(spec, clave, rng, nivel);
-  const v2 = cambiarRasgo(spec, otro, rng, nivel);
-  const opciones = opcionesSprite([spec, v1, v2], rng);
-  const correcta = opciones.find(o => o.sprite === spec).id;
+  const sinClave = cambiarRasgo(spec, clave, rng, nivel);
+  const sinOtro = cambiarRasgo(spec, otro, rng, nivel);
+  const sinAmbos = cambiarRasgo(sinClave, otro, rng, nivel);
+  const sinClaveNiTercero = cambiarRasgo(sinClave, tercero || RASGOS_CLAVE.find(r => r !== clave && r !== otro), rng, nivel);
+  const frase = plantilla => capitalizar(rellenar(plantilla, { criatura: CRIATURAS[spec.tipo].texto, rasgos: describir(spec, [clave, otro]) }));
+  return { spec, clave, rasgos, sinClave, sinOtro, sinAmbos, sinClaveNiTercero, frase };
+}
+
+function detalle(nivel, rng, plantilla) {
+  const e = escenaDosRasgos(nivel, rng);
+  const opciones = opcionesSprite([e.spec, e.sinClave, e.sinOtro, e.sinAmbos], rng);
   return {
-    frase: capitalizar(rellenar(plantilla, { criatura: CRIATURAS[spec.tipo].texto, rasgos: describir(spec, [clave, otro]) })),
-    voz: null, opciones, correcta: [correcta], palabraClave: textoRasgo(spec, clave), rasgos,
+    frase: e.frase(plantilla), voz: null, opciones,
+    correcta: [opciones.find(o => o.sprite === e.spec).id], palabraClave: textoRasgo(e.spec, e.clave), rasgos: e.rasgos,
   };
 }
 
 function nohay(nivel, rng, plantilla) {
-  const spec = specAleatorio(nivel, rng);
-  const [clave, otro] = barajar(rasgosPermitidos(spec, nivel), rng);
-  const rasgos = { [clave]: valorDe(spec, clave), [otro]: valorDe(spec, otro) };
-  const o1 = cambiarRasgo(spec, clave, rng, nivel);
-  const o2 = cambiarRasgo(spec, otro, rng, nivel);
-  const o3 = cambiarRasgo(o1, otro, rng, nivel);
-  const opciones = opcionesSprite([o1, o2, o3], rng);
+  const e = escenaDosRasgos(nivel, rng);
+  const opciones = opcionesSprite([e.sinClave, e.sinOtro, e.sinAmbos, e.sinClaveNiTercero], rng);
   return {
-    frase: capitalizar(rellenar(plantilla, { criatura: CRIATURAS[spec.tipo].texto, rasgos: describir(spec, [clave, otro]) })),
-    voz: null, opciones, correcta: ['nohay'], palabraClave: textoRasgo(spec, clave), rasgos,
+    frase: e.frase(plantilla), voz: null, opciones,
+    correcta: ['nohay'], palabraClave: textoRasgo(e.spec, e.clave), rasgos: e.rasgos,
   };
 }
 
@@ -115,10 +121,11 @@ function orden(nivel, rng, plantilla) {
   const pool = permitidos.length >= 3 ? permitidos : LUGARES;
   const [a, b, c] = barajar(pool, rng);
   const opciones = barajar([a, b, c].map(l => ({ id: l.id, lugar: l.id, lugarTexto: articuloDe(l) })), rng);
-  return {
-    frase: capitalizar(rellenar(plantilla, { lugarA: articuloDe(a), lugarB: articuloDe(b) })),
-    voz: null, opciones, correcta: [a.id, b.id], palabraClave: 'primero',
-  };
+  const frase = capitalizar(rellenar(plantilla, { lugarA: articuloDe(a), lugarB: articuloDe(b) }));
+  // La trampa es la palabra que marca el orden; cada plantilla usa una.
+  const marcas = ['primero', 'luego', 'después', 'antes', 'acaba', 'final', 'segundo', 'entra', 'dos'];
+  const clave = marcas.find(m => frase.toLowerCase().includes(m)) || b.texto;
+  return { frase, voz: null, opciones, correcta: [a.id, b.id], palabraClave: clave };
 }
 
 function nombre(nivel, rng, plantilla) {
@@ -139,13 +146,15 @@ function palabra(nivel, rng, contexto) {
   return {
     frase: 'Toca lo que oyes',
     voz: p, opciones, correcta: [opciones.find(o => o.texto === p).id], palabraClave: p,
+    claveRepeticion: `palabra:${p}`, // la frase es fija: lo que no se repite es la palabra
   };
 }
 
 function cuanto(nivel, rng, plantilla) {
   // Nunca "uno" (en plural suena mal) ni "seis" (siempre hay más criaturas
-  // que las pedidas, y el máximo en pantalla es 6).
-  const numeros = NUMEROS.filter(x => x.n >= 2 && x.n <= 5 && permitida(x.texto, nivel));
+  // que las pedidas, y el máximo en pantalla es 6). Los números no pasan el
+  // filtro de nivel: son su fuerte, y si solo saliera "dos" se adivinaría.
+  const numeros = NUMEROS.filter(x => x.n >= 2 && x.n <= 5);
   const num = elegir(numeros, rng);
   const posibles = [3, 4, 5, 6].filter(m => m > num.n);
   const m = elegir(posibles, rng);
@@ -206,9 +215,9 @@ export function generarEjercicio(tipo, nivel, rng, contexto = {}) {
       if (!gen) throw new Error(`tipo desconocido: ${tipo}`);
       ejercicio = gen(nivel, rng, elegir(plantillasDe(tipo, nivel), rng).texto);
     }
-    if (!recientes.has(ejercicio.frase)) break;
+    if (!recientes.has(ejercicio.claveRepeticion || ejercicio.frase)) break;
   }
-  return { tipo, nivel, ...ejercicio };
+  return { tipo, nivel, claveRepeticion: ejercicio.frase, ...ejercicio };
 }
 
 export function normalizarVocabulario(texto) {
@@ -216,7 +225,8 @@ export function normalizarVocabulario(texto) {
   const out = [];
   for (const cruda of (texto || '').split(/[\s,;]+/)) {
     const p = cruda.trim().toLowerCase();
-    if (!p || !/^[a-zñáéíóúü]+$/.test(p) || vistas.has(p)) continue;
+    // Menos de 3 letras no da distractores creíbles ("y" → "yy").
+    if (p.length < 3 || !/^[a-zñáéíóúü]+$/.test(p) || vistas.has(p)) continue;
     vistas.add(p);
     out.push(p);
   }

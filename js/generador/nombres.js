@@ -2,11 +2,14 @@ import { SILABAS, FINALES } from '../bancos/silabas.js';
 import { permitida } from '../grafias.js';
 import { elegir, barajar } from '../util/rng.js';
 
-// Pares de confusión típicos. Cada uno se aplica en ambos sentidos.
+// Pares de confusión típicos. Cada uno se aplica en ambos sentidos; los que
+// llevan `vocal` solo delante de e/i (que/ce, gue/ge, je/ge): así no salen
+// grafías imposibles como "qua" o "guo".
 const CONFUSIONES = [
-  ['b', 'v'], ['c', 'qu'], ['g', 'gu'], ['j', 'g'],
+  ['b', 'v'], ['c', 'qu', 'ei'], ['g', 'gu', 'ei'], ['j', 'g', 'ei'],
   ['r', 'l'], ['m', 'n'], ['d', 't'], ['p', 'b'], ['s', 'z'],
 ];
+const IMPOSIBLE = /qu[aou]|quu|cc/;
 
 function silabasHasta(nivel) {
   return Object.entries(SILABAS)
@@ -41,20 +44,26 @@ function candidatos(palabra) {
   const base = palabra.toLowerCase();
   const sustituciones = new Set();
   const intercambios = new Set();
-  for (const [a, b] of CONFUSIONES) {
+  for (const [a, b, vocal] of CONFUSIONES) {
     for (const [de, a_] of [[a, b], [b, a]]) {
       let i = base.indexOf(de);
       while (i !== -1) {
+        const siguiente = base[i + de.length] || '';
         // "ch" es un sonido propio: no se confunde su c con qu.
-        const esCh = de === 'c' && base[i + 1] === 'h';
-        if (!esCh) sustituciones.add(base.slice(0, i) + a_ + base.slice(i + de.length));
+        const esCh = de === 'c' && siguiente === 'h';
+        const vocalOk = !vocal || vocal.includes(siguiente);
+        if (!esCh && vocalOk) {
+          const candidato = base.slice(0, i) + a_ + base.slice(i + de.length);
+          if (!IMPOSIBLE.test(candidato)) sustituciones.add(candidato);
+        }
         i = base.indexOf(de, i + 1);
       }
     }
   }
   for (let i = 1; i < base.length - 1; i++) {
     if (base[i] === base[i + 1]) continue;
-    intercambios.add(base.slice(0, i) + base[i + 1] + base[i] + base.slice(i + 2));
+    const candidato = base.slice(0, i) + base[i + 1] + base[i] + base.slice(i + 2);
+    if (!IMPOSIBLE.test(candidato)) intercambios.add(candidato);
   }
   sustituciones.delete(base);
   intercambios.delete(base);
@@ -79,7 +88,8 @@ export function variantesEscritura(palabra, rng) {
 
 export function distractoresNombre(nombre, nivel, rng) {
   // Prioriza las confusiones del nivel actual: mismo filtro que el nombre.
-  const largo = c => Math.abs(c.length - nombre.length) <= 1;
+  const largo = c => Math.abs(c.length - nombre.length) <= 1
+    && (nivel >= 7 || !/qu|ge|gi/.test(c.toLowerCase())); // mismas reglas que el nombre
   const delNivel = ordenados(nombre, rng, c => largo(c) && permitida(c, Math.max(nivel, 6)));
   const lista = delNivel.length >= 2 ? delNivel : ordenados(nombre, rng, largo);
   return lista.slice(0, 2);

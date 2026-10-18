@@ -9,6 +9,8 @@ export const EXENTAS = new Set([
   'primero', 'luego', 'después', 'se', 'llama', 'llamo', 'tu', 'este', 'esta',
   'hay', 'aquí', 'cuál', 'dónde', 'cómo', 'lo', 'mi', 'su', 'ni', 'hoy', 'ya',
   'le', 'me', 'te', 'si', 'solo', 'para', 'por', 'ahora', 'más', 'bien', 'oyes',
+  // Los números son su fuerte: no pasan el filtro de grafías.
+  'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis',
 ]);
 
 // Huecos: {criatura} {criaturas} {rasgos} {rasgoNeg} {lugarA} {lugarB}
@@ -50,7 +52,7 @@ const DETALLE = [
   'Toca el {criatura} {rasgos} para abrir la puerta',
   'Toca el {criatura} {rasgos} y gana una estrella',
   'El {criatura} {rasgos} está feliz. Tócalo',
-  'Adivina: es el {criatura} {rasgos}',
+  'Lee bien: es el {criatura} {rasgos}',
   'Toca el {criatura} {rasgos} si lo ves',
   'Toca el {criatura} {rasgos} de la fila',
   'Toca el {criatura} {rasgos} y sonríe',
@@ -108,7 +110,7 @@ const ORDEN = [
   'Uno: {lugarA}. Dos: {lugarB}',
   'Toca {lugarA} y luego toca {lugarB}',
   'Primero {lugarA}, luego {lugarB}, y ya está',
-  'Mira {lugarA} y tócalo. Luego toca {lugarB}',
+  'Toca {lugarA} con cuidado. Luego toca {lugarB}',
 ];
 
 const CUANTO = [

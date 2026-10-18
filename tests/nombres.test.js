@@ -46,6 +46,23 @@ test('en 60 nombres de nivel 5 hay al menos 55 distintos', () => {
   assert.ok(set.size >= 55, String(set.size));
 });
 
+test('los distractores no tienen grafías imposibles (qua, guo, quu) ni qu/ge/gi antes del nivel 7', () => {
+  const rng = crearRng(21);
+  for (let nivel = 3; nivel <= 8; nivel++) {
+    for (let i = 0; i < 100; i++) {
+      const nombre = generarNombre(nivel, rng);
+      for (const d of distractoresNombre(nombre, nivel, rng)) {
+        const b = d.toLowerCase();
+        assert.doesNotMatch(b, /qu[aou]|quu|cc/, `${nombre} → ${d}`);
+        if (nivel < 7) assert.doesNotMatch(b, /qu|ge|gi/, `${nombre} → ${d} (nivel ${nivel})`);
+      }
+    }
+  }
+  for (const [p, malo] of [['casa', /quasa/], ['poco', /poquo/], ['gota', /guota/]]) {
+    for (let i = 0; i < 20; i++) variantesEscritura(p, rng).forEach(v => assert.doesNotMatch(v, malo, `${p} → ${v}`));
+  }
+});
+
 test('variantesEscritura devuelve 2 palabras distintas de la original y entre sí', () => {
   const rng = crearRng(4);
   for (const palabra of ['biblioteca', 'casa', 'niño', 'ventana']) {

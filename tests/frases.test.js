@@ -57,8 +57,9 @@ test('orden: dos ids en orden, ambos presentes en las opciones, y la frase los n
     const ids = e.opciones.map(o => o.id);
     e.correcta.forEach(id => assert.ok(ids.includes(id)));
     assert.ok(e.opciones.length >= 3);
-    const [a, b] = e.correcta.map(id => e.opciones.find(o => o.id === id).lugarTexto);
+    const [a, b] = e.correcta.map(id => e.opciones.find(o => o.id === id).lugarTexto.split(' ').pop());
     assert.ok(e.frase.indexOf(a) < e.frase.indexOf(b), e.frase);
+    assert.ok(e.frase.toLowerCase().includes(e.palabraClave), `${e.frase} / ${e.palabraClave}`);
   }
 });
 
@@ -155,6 +156,7 @@ test('normalizarVocabulario limpia espacios, mayúsculas, duplicados y basura', 
   assert.deepEqual(normalizarVocabulario(' Biblioteca\n\n casa  \ncasa\n123\nniño'), ['biblioteca', 'casa', 'niño']);
   assert.deepEqual(normalizarVocabulario('uno, dos; tres'), ['uno', 'dos', 'tres']);
   assert.deepEqual(normalizarVocabulario(''), []);
+  assert.deepEqual(normalizarVocabulario('y\nel\nx\nsol'), ['sol'], 'menos de 3 letras no dan distractores');
 });
 
 test('hay al menos 150 plantillas y cada tipo cumple su mínimo', () => {

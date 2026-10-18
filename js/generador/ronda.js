@@ -38,7 +38,7 @@ export function armarRonda(nivel, contexto, rng, cantidad = 12) {
     let e = null;
     for (let intento = 0; intento < 20 && !e; intento++) {
       const candidato = generarEjercicio(tipo, nivel, rng, { ...contexto, frasesRecientes: [...usadas] });
-      if (usadas.has(candidato.frase)) continue;
+      if (usadas.has(candidato.claveRepeticion)) continue;
       let pos = posicionCorrecta(candidato);
       // Nunca tres veces seguidas la correcta en la misma posición.
       if (pos !== null && pos === posAnterior && seguidas >= 2) {
@@ -55,7 +55,7 @@ export function armarRonda(nivel, contexto, rng, cantidad = 12) {
     }
     if (!e) continue;
     if (e.tipo === 'palabra') vocabulario++;
-    usadas.add(e.frase);
+    usadas.add(e.claveRepeticion);
     ronda.push(e);
   }
   return ronda;

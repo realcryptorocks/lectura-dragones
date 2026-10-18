@@ -92,8 +92,9 @@ export function crearEstado(almacen, reloj = () => new Date()) {
       h.respondidas++;
       if (primeraVez) { h.aciertosPrimera++; h.seguidosPrimera++; }
       if (usoPista) est.trampasCazadas++;
-      if (!datos.frasesRecientes.some(f => f.frase === ejercicio.frase)) {
-        datos.frasesRecientes.push({ frase: ejercicio.frase, fecha: hoy() });
+      const clave = ejercicio.claveRepeticion || ejercicio.frase;
+      if (!datos.frasesRecientes.some(f => f.frase === clave)) {
+        datos.frasesRecientes.push({ frase: clave, fecha: hoy() });
       }
     } else {
       h.seguidosPrimera = 0;
