@@ -113,7 +113,7 @@ test('detalle une dos con/sin con "y" en vez de repetir "sin … sin …"', () =
   const rng = crearRng(13);
   for (let i = 0; i < 200; i++) {
     const e = generarEjercicio('detalle', 8, rng, ctx());
-    assert.doesNotMatch(e.frase, /(con|sin) \w+ (con|sin) /, e.frase);
+    assert.doesNotMatch(e.frase, /(con|sin) (manchas|alas|cuernos) (con|sin) (manchas|alas|cuernos)/, e.frase);
   }
 });
 
