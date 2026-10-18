@@ -6,6 +6,9 @@
   <meta name="theme-color" content="#14122a">
   <title>Cría de dragones</title>
   <link rel="stylesheet" href="css/juego.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="iconos/icono-192.png">
+  <link rel="apple-touch-icon" href="iconos/icono-192.png">
 </head>
 <body>
   <main id="app">
@@ -82,5 +85,8 @@
 
   </main>
   <script type="module" src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  </script>
 </body>
 </html>

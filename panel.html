@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#14122a">
   <title>Panel · Cría de dragones</title>
   <link rel="stylesheet" href="css/panel.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="iconos/icono-192.png">
 </head>
 <body>
   <main class="panel">
@@ -78,5 +80,8 @@
     </div>
   </main>
   <script type="module" src="js/panel.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  </script>
 </body>
 </html>
