@@ -6,6 +6,7 @@ import { generarEjercicio } from './generador/frases.js';
 import { generarNombre } from './generador/nombres.js';
 import { rarezaDe, casillasCamino, LARGO } from './camino.js';
 import { svgCriatura } from './sprites.js';
+import { svgDragon } from './dragones.js';
 import { pintarEjercicio, resaltar } from './ejercicios/render.js';
 import { vozDisponible, decir } from './voz.js';
 
@@ -42,23 +43,13 @@ function ir(nombre) {
   mostrar(nombre);
 }
 
-// ---------- sprites derivados del nombre (para que cada dragón sea siempre el mismo) ----------
+// ---------- huevo del día (los dragones nacidos los dibuja dragones.js) ----------
 function hash(s) {
   let h = 2166136261;
   for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
   return h;
 }
 const COLORES_IDS = ['rojo', 'azul', 'verde', 'amarillo', 'morado', 'naranja'];
-export function spriteDeDragon(nombre, rareza) {
-  const h = hash(nombre);
-  const base = {
-    tipo: 'dragon', color: COLORES_IDS[h % 6], manchas: Boolean(h & 8), alas: Boolean(h & 16),
-    cuernos: Boolean(h & 32), tamano: 'grande',
-  };
-  if (rareza === 'raro') return { ...base, alas: true, cuernos: true };
-  if (rareza === 'legendario') return { ...base, color: 'amarillo', alas: true, cuernos: true, manchas: true };
-  return base;
-}
 
 function svgHuevoDelDia(numero, grietas = 0) {
   const spec = { tipo: 'huevo', color: COLORES_IDS[(numero * 7) % 6], manchas: numero % 3 === 0, alas: false, cuernos: false, tamano: 'grande' };
@@ -86,7 +77,7 @@ function pintarInicio() {
 
 function pintarDormido() {
   const ultimo = estado.datos.huevos[estado.datos.huevos.length - 1];
-  document.getElementById('dormido-sprite').innerHTML = ultimo ? svgCriatura(spriteDeDragon(ultimo.nombre, ultimo.rareza)) : '';
+  document.getElementById('dormido-sprite').innerHTML = ultimo ? svgDragon(ultimo.nombre, ultimo.rareza) : '';
   document.getElementById('dormido-nombre').textContent = ultimo ? ultimo.nombre : '';
   mostrar('dormido');
 }
@@ -240,7 +231,7 @@ function eclosionar(huevo) {
   setTimeout(() => {
     huevoEl.hidden = true;
     huevoEl.classList.remove('temblando');
-    dragonEl.innerHTML = svgCriatura(spriteDeDragon(nombre, rareza));
+    dragonEl.innerHTML = svgDragon(nombre, rareza);
     dragonEl.hidden = false;
     dragonEl.classList.add('apareciendo');
     document.getElementById('eclosion-nombre').textContent = nombre;
@@ -261,8 +252,9 @@ function pintarDragonario() {
   for (const h of [...huevos].reverse()) {
     const ficha = document.createElement('div');
     ficha.className = `ficha ${h.rareza}`;
-    ficha.innerHTML = svgCriatura(spriteDeDragon(h.nombre, h.rareza))
-      + `<p class="nombre">${h.nombre}</p><p class="rareza">${{ comun: 'común', raro: 'raro', legendario: 'legendario' }[h.rareza]}</p>`;
+    ficha.innerHTML = svgDragon(h.nombre, h.rareza) + '<p class="nombre"></p><p class="rareza"></p>';
+    ficha.querySelector('.nombre').textContent = h.nombre;
+    ficha.querySelector('.rareza').textContent = { comun: 'común', raro: 'raro', legendario: 'legendario' }[h.rareza];
     lista.append(ficha);
   }
   mostrar('dragonario');

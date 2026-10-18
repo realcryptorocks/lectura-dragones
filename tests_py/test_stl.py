@@ -3,7 +3,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 
-from legendario_stl import construir_pieza, nombre_archivo  # noqa: E402
+from legendario_stl import construir_pieza, nombre_archivo, figura_dragon, poligonos_texto  # noqa: E402
+from rasgos_dragon import ESPECIES, rasgos_de_dragon  # noqa: E402
 
 
 def test_pieza_cerrada_y_tamano():
@@ -26,9 +27,19 @@ def test_nombre_largo_cabe():
 
 
 def test_las_letras_conservan_sus_huecos():
-    from legendario_stl import poligonos_texto
     piezas = poligonos_texto("Brulok")
     assert sum(len(p.interiors) for p in piezas) >= 3  # B (2), o (1)
+
+
+def test_cada_especie_da_una_figura_cerrada():
+    for especie in ESPECIES:
+        r = rasgos_de_dragon("Prueba", "legendario")
+        r["especie"] = especie
+        f = figura_dragon(r)
+        assert f.is_watertight, especie
+        assert f.volume > 0, especie
+        assert f.bounds[0][2] >= -0.01, especie  # apoyada en z = 0
+        assert f.extents[2] <= 60, especie
 
 
 def test_el_nombre_cambia_la_pieza():

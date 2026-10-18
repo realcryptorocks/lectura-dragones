@@ -32,7 +32,7 @@ pip install -r tools/requirements.txt
 python tools/legendario_stl.py Zaftín
 ```
 
-Deja `salida/dragon-zaftin.stl` (76 × 56 × 65 mm, malla cerrada, sin soportes): peana con el nombre en relieve y el huevo con el dragón. Llévalo a imprimir tal cual.
+Deja `salida/dragon-zaftin.stl` (76 × 56 × ~60 mm, malla cerrada, sin soportes): la **figura del mismo dragón que vio en la tablet** (misma especie y rasgos: `tools/rasgos_dragon.py` calca el generador `js/dragones.js`), de pie sobre una peana con el nombre en relieve y un sol de rayos detrás. Llévalo a imprimir tal cual. Con `--rareza raro` o `--rareza comun` se puede imprimir cualquier otro dragón del Dragonario.
 
 ## Desarrollo
 
