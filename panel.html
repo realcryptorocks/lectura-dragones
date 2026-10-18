@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14122a">
+  <title>Panel · Cría de dragones</title>
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+  <main class="panel">
+    <header>
+      <a class="volver" href="index.html">⬅ Volver al juego</a>
+      <h1>Panel del padre</h1>
+    </header>
+
+    <section id="pin-zona" class="tarjeta">
+      <h2>PIN</h2>
+      <form id="pin-form">
+        <input id="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-label="PIN de 4 dígitos">
+        <button type="submit">Entrar</button>
+      </form>
+      <p id="pin-error" class="error" hidden>PIN incorrecto.</p>
+    </section>
+
+    <div id="contenido" hidden>
+      <section class="tarjeta" id="aviso-voz" hidden>
+        <h2>Voz</h2>
+        <p>La tablet no tiene voz en español. Ajustes → Sistema → Idiomas → Síntesis de voz → instalar voz en español. Mientras tanto el juego funciona sin los ejercicios de voz.</p>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Resumen</h2>
+        <dl class="resumen" id="resumen"></dl>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Lo que más le cuesta</h2>
+        <div class="dos-columnas">
+          <div><h3>Palabras</h3><ol id="palabras-dificiles"></ol></div>
+          <div><h3>Tipos de trampa</h3><ol id="tipos-dificiles"></ol></div>
+        </div>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Vocabulario de la semana</h2>
+        <p class="ayuda">Pega las palabras de los deberes, una por línea. Saldrán en los ejercicios de voz de los próximos días.</p>
+        <textarea id="vocabulario" rows="6" spellcheck="false"></textarea>
+        <div class="fila">
+          <button id="guardar-vocabulario" type="button">Guardar</button>
+          <span id="vocabulario-resultado" class="ayuda"></span>
+        </div>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Legendarios</h2>
+        <ul id="legendarios"></ul>
+        <p class="ayuda">Para imprimir uno: en el ordenador, <code>python tools/legendario_stl.py Nombre</code> genera el archivo .stl con el nombre grabado.</p>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Copia de seguridad</h2>
+        <div class="fila">
+          <button id="exportar" type="button">Exportar progreso</button>
+          <label class="boton">Importar <input id="importar" type="file" accept="application/json,.json" hidden></label>
+        </div>
+        <p id="importar-resultado" class="ayuda"></p>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Cambiar PIN</h2>
+        <form id="pin-nuevo-form" class="fila">
+          <input id="pin-nuevo" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="4 dígitos" aria-label="Nuevo PIN">
+          <button type="submit">Cambiar</button>
+          <span id="pin-nuevo-resultado" class="ayuda"></span>
+        </form>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="js/panel.js"></script>
+</body>
+</html>
