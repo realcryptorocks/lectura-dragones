@@ -1,0 +1,11 @@
+{
+  "name": "lectura-dragones",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cría de dragones: juego de lectura para tablet",
+  "scripts": {
+    "test": "node --test \"tests/*.test.js\"",
+    "servir": "python -m http.server 8765"
+  }
+}
