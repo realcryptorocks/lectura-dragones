@@ -7,7 +7,9 @@ Juego de lectura para tablet: un huevo al día que se incuba leyendo frases cort
 
 ## Cómo se juega
 
-1. Abre la web en Chrome de la tablet y elige "Añadir a pantalla de inicio": queda como una app y funciona sin conexión.
+La web vive en **https://realcryptorocks.github.io/lectura-dragones/** (repo `realcryptorocks/lectura-dragones`, rama `main`; cada `git push` la actualiza en un par de minutos).
+
+1. Abre esa dirección en Chrome de la tablet y elige "Añadir a pantalla de inicio": queda como una app y funciona sin conexión.
 2. Toca el huevo. Aparece una frase: léela y haz lo que dice (tocar la criatura correcta, encontrar la palabra mentirosa, elegir el nombre bien escrito…).
 3. Si cae en la trampa, el juego enseña la palabra clave y repite la frase. Tras dos fallos o 20 segundos aparece la **pista** (👂): el dragón pronuncia solo esa palabra.
 4. Con 8 aciertos (más uno por cada fallo, hasta 12) el huevo eclosiona y la sesión termina hasta mañana.
