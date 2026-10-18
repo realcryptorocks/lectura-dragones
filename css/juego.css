@@ -1,0 +1,184 @@
+/* Cría de dragones: cueva oscura, letra grande, botones enormes. */
+:root {
+  --fondo: #14122a;
+  --fondo-2: #1f1b3d;
+  --tarjeta: #2a2550;
+  --tarjeta-borde: #4a4382;
+  --texto: #f3efff;
+  --texto-suave: #b9b2d9;
+  --acento: #f2c14e;
+  --acento-2: #ff8a5c;
+  --trampa: #ff5c7a;
+  --ok: #5ddc8a;
+  --radio: 22px;
+  --sombra: 0 10px 30px rgba(0, 0, 0, .35);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: radial-gradient(ellipse at top, var(--fondo-2), var(--fondo) 70%);
+  color: var(--texto);
+  font-family: "Atkinson Hyperlegible", "Andika", "Lexend", "Segoe UI", Roboto, system-ui, sans-serif;
+  font-size: 22px;
+  line-height: 1.3;
+  user-select: none;
+  overflow: hidden;
+}
+
+#app { height: 100%; display: flex; flex-direction: column; }
+[data-pantalla] { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+[data-pantalla][hidden] { display: none; }
+
+.barra {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; min-height: 72px;
+}
+.barra .icono:last-child { margin-left: auto; }
+.titulo-barra { margin: 0; font-size: 1.3rem; font-weight: 700; }
+
+.icono {
+  width: 60px; height: 60px; border-radius: 50%;
+  border: 2px solid var(--tarjeta-borde); background: var(--tarjeta);
+  color: var(--texto); font-size: 1.5rem; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none; cursor: pointer;
+}
+.icono.grande { width: 110px; height: 110px; font-size: 3rem; background: var(--acento); color: #2a1d00; border-color: #c89a2a; }
+.icono:active { transform: scale(.94); }
+
+.centro {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; padding: 16px; text-align: center;
+}
+
+.susurro { margin: 0; color: var(--texto-suave); font-size: 1.2rem; }
+.susurro.pequeno { font-size: 1rem; }
+.titulo { margin: 0; font-size: 2rem; font-weight: 700; }
+.nombre-dragon { font-size: 3rem; color: var(--acento); letter-spacing: .02em; }
+
+/* Huevo grande de la pantalla de inicio */
+.huevo-grande {
+  width: min(52vmin, 300px); height: min(52vmin, 300px);
+  border: none; background: none; padding: 0; cursor: pointer;
+  filter: drop-shadow(0 0 30px rgba(242, 193, 78, .35));
+  animation: latir 2.2s ease-in-out infinite;
+}
+.huevo-grande svg { width: 100%; height: 100%; }
+@keyframes latir { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+.sprite-grande { width: min(55vmin, 320px); height: min(55vmin, 320px); }
+.sprite-grande svg { width: 100%; height: 100%; }
+.durmiendo { filter: saturate(.6) brightness(.8); }
+
+/* Progreso del huevo durante la ronda */
+.barra-ejercicio { justify-content: center; }
+.huevo-mini { width: 56px; height: 56px; }
+.huevo-mini svg { width: 100%; height: 100%; }
+
+/* Grietas: se destapan según data-grietas (0..8) */
+.grieta { stroke: #1a1120; stroke-width: 4; fill: none; stroke-linecap: round; opacity: 0; }
+[data-grietas="1"] .grieta:nth-of-type(-n+1), [data-grietas="2"] .grieta:nth-of-type(-n+2),
+[data-grietas="3"] .grieta:nth-of-type(-n+3), [data-grietas="4"] .grieta:nth-of-type(-n+4),
+[data-grietas="5"] .grieta:nth-of-type(-n+5), [data-grietas="6"] .grieta:nth-of-type(-n+6),
+[data-grietas="7"] .grieta:nth-of-type(-n+7), [data-grietas="8"] .grieta { opacity: 1; }
+
+/* Ejercicio */
+#zona-ejercicio {
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
+  padding: 0 16px 16px; gap: 14px;
+}
+.frase {
+  margin: 0; font-size: clamp(30px, 5.2vmin, 48px); font-weight: 700; text-align: center;
+  line-height: 1.35; text-wrap: balance;
+}
+.frase mark { background: var(--acento); color: #2a1d00; border-radius: 8px; padding: 0 .15em; }
+.frase mark.pista-luz { background: none; color: var(--acento); text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 6px; }
+.cabecera-frase { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 8px 0; }
+
+.opciones {
+  flex: 1; display: grid; gap: 14px; align-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.opcion {
+  min-height: 120px; border-radius: var(--radio);
+  border: 3px solid var(--tarjeta-borde); background: var(--tarjeta);
+  color: var(--texto); font: inherit; font-size: 1.7rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; padding: 10px; cursor: pointer;
+  box-shadow: var(--sombra);
+}
+.opcion svg { width: min(28vmin, 180px); height: min(28vmin, 180px); }
+.opcion:active { transform: scale(.96); }
+.opcion.seleccionada { border-color: var(--ok); background: #23423a; }
+.opcion.nohay { font-size: 1.3rem; background: #3a2a3a; border-color: #6a4a6a; min-height: 90px; }
+.opcion .etiqueta-lugar { display: block; font-size: 1.2rem; color: var(--texto-suave); margin-top: 4px; }
+.opcion.lugar { flex-direction: column; }
+
+.palabras { flex: 1; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-content: center; }
+.palabra {
+  padding: 14px 22px; border-radius: 18px; min-height: 76px;
+  border: 3px solid var(--tarjeta-borde); background: var(--tarjeta); color: var(--texto);
+  font: inherit; font-size: clamp(28px, 4.5vmin, 42px); font-weight: 700; cursor: pointer;
+}
+
+.escena { display: flex; justify-content: center; align-items: flex-end; gap: 10px; }
+.escena svg { width: min(30vmin, 200px); height: min(30vmin, 200px); }
+
+.pie-ejercicio { display: flex; justify-content: center; gap: 16px; min-height: 70px; align-items: center; }
+.boton-listo { background: var(--ok); color: #0e2a1a; border-color: #3aa866; }
+.boton-pista { background: #4a3a7a; border-color: #8a7acc; }
+.boton-pista[hidden] { display: none; }
+
+.aviso {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  background: var(--acento); color: #2a1d00; padding: 12px 22px; border-radius: 16px;
+  font-weight: 700; font-size: 1.3rem; box-shadow: var(--sombra);
+}
+.aviso[hidden] { display: none; }
+
+/* Trampa */
+.trampa .titulo { color: var(--trampa); }
+.trampa .frase mark { background: var(--trampa); color: #fff; }
+
+/* Eclosión */
+@keyframes temblar { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+.temblando { animation: temblar .35s ease-in-out 6; }
+@keyframes aparecer { from { transform: scale(.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.apareciendo { animation: aparecer .8s cubic-bezier(.2, 1.4, .4, 1) both; }
+.legendario .nombre-dragon { text-shadow: 0 0 24px var(--acento); }
+
+/* Dragonario */
+.rejilla-dragones {
+  flex: 1; overflow: auto; padding: 8px 16px 24px;
+  display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+.ficha { background: var(--tarjeta); border: 2px solid var(--tarjeta-borde); border-radius: var(--radio); padding: 10px; text-align: center; }
+.ficha svg { width: 100%; height: auto; aspect-ratio: 1; }
+.ficha .nombre { font-weight: 700; font-size: 1.3rem; margin: 4px 0 0; }
+.ficha .rareza { font-size: .9rem; color: var(--texto-suave); margin: 0; }
+.ficha.raro { border-color: #7fb6ff; }
+.ficha.legendario { border-color: var(--acento); box-shadow: 0 0 18px rgba(242, 193, 78, .35); }
+.vacio { grid-column: 1 / -1; text-align: center; color: var(--texto-suave); padding: 40px 0; }
+
+/* Camino */
+.camino {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-content: center;
+  padding: 10px 16px; flex: 1; overflow: auto;
+}
+.casilla {
+  width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--tarjeta); border: 3px solid var(--tarjeta-borde); font-weight: 700; font-size: 1.1rem; color: var(--texto-suave);
+}
+.casilla.hecha { background: var(--ok); color: #0e2a1a; border-color: #3aa866; }
+.casilla.actual { border-color: var(--acento); box-shadow: 0 0 16px var(--acento); color: var(--texto); }
+.casilla.raro { border-style: dashed; }
+.casilla.legendario { width: 84px; height: 84px; font-size: 2rem; border-color: var(--acento); }
+.camino + .susurro { padding: 0 16px 24px; text-align: center; }
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .frase { font-size: clamp(26px, 6vh, 40px); }
+  .opcion { min-height: 100px; }
+  .opcion svg { width: min(22vh, 150px); height: min(22vh, 150px); }
+}

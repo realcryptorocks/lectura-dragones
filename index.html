@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#14122a">
+  <title>Cría de dragones</title>
+  <link rel="stylesheet" href="css/juego.css">
+</head>
+<body>
+  <main id="app">
+
+    <section data-pantalla="inicio" hidden>
+      <header class="barra">
+        <button class="icono" data-ir="camino" aria-label="Camino">🗺️</button>
+        <button class="icono" data-ir="dragonario" aria-label="Dragonario">🐉</button>
+        <a class="icono" href="panel.html" aria-label="Panel">⚙️</a>
+      </header>
+      <div class="centro">
+        <p class="susurro" id="inicio-texto">Tu huevo tiene hambre</p>
+        <button id="huevo-inicio" class="huevo-grande" aria-label="Alimentar al huevo"></button>
+        <p class="susurro pequeno" id="inicio-camino"></p>
+      </div>
+    </section>
+
+    <section data-pantalla="dormido" hidden>
+      <header class="barra">
+        <button class="icono" data-ir="camino" aria-label="Camino">🗺️</button>
+        <button class="icono" data-ir="dragonario" aria-label="Dragonario">🐉</button>
+        <a class="icono" href="panel.html" aria-label="Panel">⚙️</a>
+      </header>
+      <div class="centro">
+        <div id="dormido-sprite" class="sprite-grande durmiendo"></div>
+        <p class="titulo" id="dormido-nombre"></p>
+        <p class="susurro">Está dormido. Hasta mañana no come.</p>
+      </div>
+    </section>
+
+    <section data-pantalla="ejercicio" hidden>
+      <header class="barra barra-ejercicio">
+        <div id="huevo-progreso" class="huevo-mini" aria-hidden="true"></div>
+        <div id="progreso-texto" class="susurro pequeno"></div>
+      </header>
+      <div id="zona-ejercicio"></div>
+      <div id="aviso" class="aviso" hidden></div>
+    </section>
+
+    <section data-pantalla="trampa" hidden>
+      <div class="centro trampa">
+        <p class="titulo">¡Casi! La trampa estaba aquí</p>
+        <p id="trampa-frase" class="frase"></p>
+      </div>
+    </section>
+
+    <section data-pantalla="eclosion" hidden>
+      <div class="centro">
+        <div id="eclosion-huevo" class="sprite-grande"></div>
+        <div id="eclosion-dragon" class="sprite-grande" hidden></div>
+        <p class="susurro" id="eclosion-rareza"></p>
+        <p class="titulo nombre-dragon" id="eclosion-nombre"></p>
+        <p class="susurro" id="eclosion-extra" hidden></p>
+        <button id="eclosion-seguir" class="icono grande" aria-label="Seguir" hidden>➜</button>
+      </div>
+    </section>
+
+    <section data-pantalla="dragonario" hidden>
+      <header class="barra">
+        <button class="icono" data-ir="inicio" aria-label="Volver">⬅️</button>
+        <p class="titulo-barra">Dragonario</p>
+      </header>
+      <div id="dragonario-lista" class="rejilla-dragones"></div>
+    </section>
+
+    <section data-pantalla="camino" hidden>
+      <header class="barra">
+        <button class="icono" data-ir="inicio" aria-label="Volver">⬅️</button>
+        <p class="titulo-barra">Camino</p>
+      </header>
+      <div id="camino-lista" class="camino"></div>
+      <p class="susurro" id="camino-texto"></p>
+    </section>
+
+  </main>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

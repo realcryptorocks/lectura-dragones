@@ -97,7 +97,7 @@ test('cuanto: el número de criaturas no coincide con el pedido y correcta pide 
     const n = e.cantidad;
     assert.ok(n >= 1 && n <= 6);
     const sprites = e.opciones.filter(o => o.sprite);
-    assert.notEqual(sprites.length, n);
+    assert.ok(sprites.length > n, `${e.frase}: hay ${sprites.length}`);
     assert.ok(sprites.length >= 3 && sprites.length <= 6);
     assert.deepEqual(e.correcta, [`cualquiera:${n}`]);
     assert.ok(e.frase.includes(e.palabraClave));

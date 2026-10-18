@@ -143,10 +143,11 @@ function palabra(nivel, rng, contexto) {
 }
 
 function cuanto(nivel, rng, plantilla) {
-  // Nunca "uno": en plural suena mal ("uno dragones").
-  const numeros = NUMEROS.filter(x => x.n >= 2 && permitida(x.texto, nivel));
+  // Nunca "uno" (en plural suena mal) ni "seis" (siempre hay más criaturas
+  // que las pedidas, y el máximo en pantalla es 6).
+  const numeros = NUMEROS.filter(x => x.n >= 2 && x.n <= 5 && permitida(x.texto, nivel));
   const num = elegir(numeros, rng);
-  const posibles = [3, 4, 5, 6].filter(m => m !== num.n);
+  const posibles = [3, 4, 5, 6].filter(m => m > num.n);
   const m = elegir(posibles, rng);
   const spec = specAleatorio(nivel, rng);
   const opciones = Array.from({ length: m }, (_, i) => ({ id: `c${i}`, sprite: spec }));
