@@ -33,8 +33,9 @@ function rasgosPermitidos(spec, nivel) {
 // "azul con manchas", "grande sin alas", "rojo pequeño"…: color y tamaño
 // delante, los con/sin detrás.
 function describir(spec, rasgos) {
-  const orden = ['color', 'tamano', 'manchas', 'alas', 'cuernos'];
-  return orden.filter(r => rasgos.includes(r)).map(r => textoRasgo(spec, r)).join(' ');
+  const delante = ['color', 'tamano'].filter(r => rasgos.includes(r)).map(r => textoRasgo(spec, r));
+  const detras = ['manchas', 'alas', 'cuernos'].filter(r => rasgos.includes(r)).map(r => textoRasgo(spec, r));
+  return [...delante, detras.join(' y ')].filter(Boolean).join(' ');
 }
 
 function valorDe(spec, rasgo) {
@@ -142,7 +143,8 @@ function palabra(nivel, rng, contexto) {
 }
 
 function cuanto(nivel, rng, plantilla) {
-  const numeros = NUMEROS.filter(x => permitida(x.texto, nivel));
+  // Nunca "uno": en plural suena mal ("uno dragones").
+  const numeros = NUMEROS.filter(x => x.n >= 2 && permitida(x.texto, nivel));
   const num = elegir(numeros, rng);
   const posibles = [3, 4, 5, 6].filter(m => m !== num.n);
   const m = elegir(posibles, rng);

@@ -104,6 +104,19 @@ test('cuanto: el número de criaturas no coincide con el pedido y correcta pide 
   }
 });
 
+test('cuanto nunca pide uno (evita "uno dragones")', () => {
+  const rng = crearRng(12);
+  for (let i = 0; i < 200; i++) assert.ok(generarEjercicio('cuanto', 8, rng, ctx()).cantidad >= 2);
+});
+
+test('detalle une dos con/sin con "y" en vez de repetir "sin … sin …"', () => {
+  const rng = crearRng(13);
+  for (let i = 0; i < 200; i++) {
+    const e = generarEjercicio('detalle', 8, rng, ctx());
+    assert.doesNotMatch(e.frase, /(con|sin) \w+ (con|sin) /, e.frase);
+  }
+});
+
 test('palabra: usa el vocabulario, la voz dice la palabra y hay 3 escrituras distintas', () => {
   const rng = crearRng(8);
   const e = generarEjercicio('palabra', 3, rng, ctx({ vocabulario: ['biblioteca'] }));
